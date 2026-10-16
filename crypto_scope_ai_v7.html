@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1220">
+<title>Crypto Scope AI V7 — Confluence Decision Engine</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d2f;--panel2:#1a2940;--text:#f4f7ff;--muted:#a9b8cf;--line:#2a3b55;--green:#48d6a0;--red:#ff7f88;--yellow:#ffd166;--blue:#7eb7ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1100px;margin:auto;padding:14px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:5px 0 16px}h1{font-size:21px;margin:0}h2{font-size:16px;margin:0 0 12px}.sub,.muted,.note{color:var(--muted)}.sub{font-size:12px}.pill,.tag{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;min-width:0}.section{margin-top:11px}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.row span:last-child,.row b{text-align:right;overflow-wrap:anywhere}.big{font-size:22px;font-weight:750}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.btn,select,input{background:#1a2940;color:var(--text);border:1px solid #3d526f;border-radius:9px;padding:10px 11px;font:inherit;max-width:100%}.btn{background:#23456d;font-weight:700;cursor:pointer}.btn:disabled{opacity:.55}.note{font-size:12px}.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.field{display:flex;flex-direction:column;gap:5px;min-width:130px}.field label{font-size:12px;color:var(--muted)}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:700px;font-size:12px}th,td{text-align:right;padding:9px 7px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}th:first-child,td:first-child{text-align:left}tbody tr.atm{background:#20324a}tbody tr:hover{background:#1a2940}.status{font-size:12px;color:var(--muted);margin-top:9px}.metricgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.metric{background:var(--panel2);border-radius:10px;padding:10px;min-width:0}.metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:17px;margin-top:5px;overflow-wrap:anywhere}.footer{font-size:12px;color:var(--muted);margin:16px 0}.hide{display:none}
+.alert-good{color:var(--green)}.alert-bad{color:var(--red)}
+@media(max-width:580px){main{padding:10px}h1{font-size:19px}.metricgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:11px}.grid{grid-template-columns:1fr}.field{flex:1}.toolbar .btn{flex:1}.big{font-size:20px}}
+
+.setup-score{font-size:30px;font-weight:800;letter-spacing:-.5px}.pill-good{color:var(--green)}.pill-warn{color:var(--yellow)}.pill-bad{color:var(--red)}
+.smallgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{background:var(--panel2);border-radius:10px;padding:10px}.mini small{display:block;color:var(--muted);font-size:11px}.mini strong{display:block;margin-top:5px;font-size:16px;overflow-wrap:anywhere}
+.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.formgrid .field{min-width:0}.hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+@media(max-width:580px){.smallgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.journal-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.journal-form .field{min-width:0}
+.journal-list{display:grid;gap:8px;margin-top:12px}.journal-item{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.journal-item .top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.journal-item p{margin:6px 0;color:var(--muted);font-size:12px}
+@media(max-width:580px){.journal-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head>
+<body><main>
+<header><div><h1>◈ CRYPTO SCOPE AI <span style="color:#7eb7ff">V7</span></h1><div class="sub">Smart Money + 4H/1H/15m + Options quality · manual execution only</div></div><span class="pill">NO AUTO-TRADING</span></header>
+<div class="card">
+ <div class="toolbar">
+  <div class="field"><label for="underlying">Underlying</label><select id="underlying"><option value="ETH">ETH</option><option value="BTC">BTC</option><option value="SOL">SOL</option></select></div>
+  <div class="field"><label for="expiry">Expiry date</label><input id="expiry" type="date"></div>
+  <div class="field"><label for="range">Strikes shown</label><select id="range"><option value="all">All returned</option><option value="10" selected>Near ATM ± 10</option><option value="5">Near ATM ± 5</option><option value="20">Near ATM ± 20</option></select></div>
+  <button class="btn" id="load">Load option chain</button>
+ </div>
+ <div class="status" id="status">Expiry choose karke “Load option chain” dabayein. Data Delta Exchange India public API se fetch hoga.</div>
+
+</div>
+<section class="grid section">
+ <div class="card">
+  <h2>ETH / Underlying Trend</h2>
+  <div class="row"><span>Spot / ticker price</span><b id="trendSpot">Unavailable</b></div>
+  <div class="row"><span>4H trend (EMA 20/50)</span><b id="trend4h">Waiting</b></div>
+  <div class="row"><span>1H trend (EMA 20/50)</span><b id="trend1h">Waiting</b></div>
+  <div class="row"><span>Recent 1H swing low</span><b id="trendLow">Unavailable</b></div>
+  <div class="row"><span>Recent 1H swing high</span><b id="trendHigh">Unavailable</b></div>
+  <div class="row"><span>Liquidity sweep check</span><b id="sweep">Waiting</b></div>
+  <p class="note" id="trendNote">Trend candles load hone ke baad rule-based summary yahan dikhegi.</p>
+ </div>
+ <div class="card">
+  <h2>Combined Market Read</h2>
+  <div class="big yellow" id="combinedBias">WAIT</div>
+  <div class="row"><span>Trend alignment</span><b id="trendAlign">Unavailable</b></div>
+  <div class="row"><span>Put/Call OI ratio</span><b id="combinedPCR">Unavailable</b></div>
+  <div class="row"><span>Highest Call OI strike</span><b id="combinedCallWall">Unavailable</b></div>
+  <div class="row"><span>Highest Put OI strike</span><b id="combinedPutWall">Unavailable</b></div>
+  <p class="note" id="combinedNote">Trend + OI context; ye guaranteed trade signal nahi hai.</p>
+ </div>
+</section>
+<section class="metricgrid section">
+ <div class="metric"><small>Underlying spot (if returned)</small><strong id="spot">Unavailable</strong></div>
+ <div class="metric"><small>ATM strike</small><strong id="atm">Unavailable</strong></div>
+ <div class="metric"><small>Call OI total (returned contracts)</small><strong id="calloi">Unavailable</strong></div>
+ <div class="metric"><small>Put OI total (returned contracts)</small><strong id="putoi">Unavailable</strong></div>
+</section>
+<section class="grid section">
+ <div class="card"><h2>Quick read</h2>
+  <div class="row"><span>Call/Put OI ratio</span><b id="pcr">Unavailable</b></div>
+  <div class="row"><span>Highest Call OI strike</span><b id="maxcall">Unavailable</b></div>
+  <div class="row"><span>Highest Put OI strike</span><b id="maxput">Unavailable</b></div>
+  <div class="row"><span>Displayed option rows</span><b id="rows">0</b></div>
+  <p class="note">PCR yahan returned chain ke available OI fields par based hai. Yeh akela buy/sell signal nahi hai.</p>
+ </div>
+ <div class="card"><h2>How to read</h2>
+  <div class="row"><span>Premium</span><span>Mark price / last price, if returned</span></div>
+  <div class="row"><span>Bid / Ask</span><span>Best bid & ask; spread check karein</span></div>
+  <div class="row"><span>IV</span><span>Exchange-provided IV field, if returned</span></div>
+  <div class="row"><span>OI</span><span>Open interest, if returned</span></div>
+  <p class="note">Unavailable field ko blank dikhaya jayega—software koi value invent nahi karta.</p>
+ </div>
+</section>
+
+<section class="grid section">
+ <div class="card">
+  <h2>V5 Setup Score (rule-based)</h2>
+  <div class="setup-score yellow" id="setupScore">--/10</div>
+  <div class="row"><span>Market state</span><b id="setupState">Waiting for data</b></div>
+  <div class="row"><span>4H + 1H alignment</span><b id="setupAlign">Unavailable</b></div>
+  <div class="row"><span>Liquidity sweep</span><b id="setupSweep">Unavailable</b></div>
+  <div class="row"><span>Option chain quality</span><b id="setupLiquidity">Unavailable</b></div>
+  <p class="hint" id="setupReason">Score live data aane ke baad calculate hoga. Score probability ya profit guarantee nahi hai.</p>
+ </div>
+ <div class="card">
+  <h2>Manual trade checklist</h2>
+  <div class="row"><span>Possible direction</span><b id="planDirection">WAIT</b></div>
+  <div class="row"><span>Underlying reference zone</span><b id="planZone">Unavailable</b></div>
+  <div class="row"><span>Option liquidity check</span><b id="planSpread">Unavailable</b></div>
+  <div class="row"><span>Pre-trade status</span><b id="planStatus">Wait for complete data</b></div>
+  <p class="hint">Underlying level sirf chart reference hai, option premium ka entry/SL nahi. Entry manually confirm karein; expiry ke paas premium tezi se gir sakta hai.</p>
+ </div>
+</section>
+
+<section class="card section">
+ <h2>Risk Calculator (manual option premium)</h2>
+ <p class="note">Option BUY ke liye premium entry aur premium stop-loss bharein. “Units per contract” exchange ke contract multiplier ke hisaab se set karein; agar sure nahi hain to order size use na karein.</p>
+ <div class="formgrid">
+  <div class="field"><label for="riskCapital">Trading capital (₹)</label><input id="riskCapital" type="number" min="1" step="1" value="1000"></div>
+  <div class="field"><label for="riskPct">Risk per trade (%)</label><input id="riskPct" type="number" min="0.1" max="5" step="0.1" value="1"></div>
+  <div class="field"><label for="entryPremium">Entry premium</label><input id="entryPremium" type="number" min="0.01" step="0.01" placeholder="e.g. 50"></div>
+  <div class="field"><label for="stopPremium">Stop-loss premium</label><input id="stopPremium" type="number" min="0.01" step="0.01" placeholder="e.g. 40"></div>
+  <div class="field"><label for="targetPremium">Target premium</label><input id="targetPremium" type="number" min="0.01" step="0.01" placeholder="e.g. 70"></div>
+  <div class="field"><label for="contractUnits">Units per contract</label><input id="contractUnits" type="number" min="0.0001" step="any" value="1"></div>
+ </div>
+ <div class="toolbar" style="margin-top:10px"><button class="btn" id="calcRisk">Calculate risk</button><button class="btn" id="resetRisk" type="button">Reset example</button></div>
+ <div class="smallgrid section">
+  <div class="mini"><small>Risk budget</small><strong id="riskBudget">₹10</strong></div>
+  <div class="mini"><small>Estimated quantity</small><strong id="riskQty">--</strong></div>
+  <div class="mini"><small>Max planned loss</small><strong id="riskLoss">--</strong></div>
+  <div class="mini"><small>Target profit estimate</small><strong id="riskProfit">--</strong></div>
+  <div class="mini"><small>Risk : Reward</small><strong id="riskRR">--</strong></div>
+  <div class="mini"><small>Capital used (premium)</small><strong id="riskCost">--</strong></div>
+ </div>
+ <p class="hint" id="riskNote">Fees, slippage, spread, gaps and execution differences can increase actual loss. Quantity is a mathematical estimate, not an instruction to trade.</p>
+</section>
+
+
+
+<section class="card section">
+ <h2>V7 Confluence Decision Engine</h2>
+ <div class="big yellow" id="v7Decision">WAIT</div>
+ <p class="note" id="v7Summary">Waiting for live trend and option data.</p>
+ <div class="smallgrid">
+  <div class="mini"><small>4H direction</small><strong id="v7Four">—</strong></div>
+  <div class="mini"><small>1H direction</small><strong id="v7One">—</strong></div>
+  <div class="mini"><small>15m confirmation</small><strong id="v7Fifteen">—</strong></div>
+  <div class="mini"><small>Market structure</small><strong id="v7Structure">—</strong></div>
+  <div class="mini"><small>Liquidity sweep</small><strong id="v7Sweep">—</strong></div>
+  <div class="mini"><small>Options quality</small><strong id="v7Options">—</strong></div>
+ </div>
+ <p class="hint" id="v7Why">Decision is rule-based and will default to WAIT when confirmation or data is missing.</p>
+</section>
+
+<section class="card section">
+ <h2>V7 Trade Journal (aapke manual records)</h2>
+ <p class="note">Signal dekhkar trade karna zaroori nahi. Is journal mein apna plan ya completed trade record karein. Records isi browser/device mein save hote hain; browser data clear karne par mit sakte hain.</p>
+ <div class="journal-form">
+  <div class="field"><label for="journalSide">Side / plan</label><select id="journalSide"><option value="CALL watch">CALL watch</option><option value="PUT watch">PUT watch</option><option value="NO TRADE">NO TRADE</option><option value="CALL trade">CALL trade</option><option value="PUT trade">PUT trade</option></select></div>
+  <div class="field"><label for="journalEntry">Entry premium (₹/quote)</label><input id="journalEntry" type="number" min="0" step="any" placeholder="Optional"></div>
+  <div class="field"><label for="journalSL">SL premium</label><input id="journalSL" type="number" min="0" step="any" placeholder="Optional"></div>
+  <div class="field"><label for="journalTarget">Target premium</label><input id="journalTarget" type="number" min="0" step="any" placeholder="Optional"></div>
+  <div class="field"><label for="journalOutcome">Outcome</label><select id="journalOutcome"><option value="Planned">Planned</option><option value="Win">Win</option><option value="Loss">Loss</option><option value="Breakeven">Breakeven</option><option value="Skipped">Skipped</option></select></div>
+  <div class="field"><label for="journalPnl">P/L (₹)</label><input id="journalPnl" type="number" step="any" placeholder="Optional"></div>
+ </div>
+ <div class="field" style="margin-top:9px"><label for="journalNotes">Reason / lesson</label><textarea id="journalNotes" rows="2" placeholder="Example: 4H bullish, 1H confirmation ka wait kiya…"></textarea></div>
+ <div class="toolbar" style="margin-top:10px">
+  <button class="btn" id="journalAdd" type="button">Save journal record</button>
+  <button class="btn" id="journalUseSetup" type="button">Fill current analysis</button>
+  <button class="btn" id="journalExport" type="button">Export CSV</button>
+  <button class="btn" id="journalClear" type="button">Clear journal</button>
+ </div>
+ <div class="smallgrid section">
+  <div class="mini"><small>Total records</small><strong id="journalCount">0</strong></div>
+  <div class="mini"><small>Recorded P/L total</small><strong id="journalTotal">₹0</strong></div>
+  <div class="mini"><small>Completed outcomes</small><strong id="journalCompleted">0</strong></div>
+ </div>
+ <div id="journalStatus" class="hint">No records saved yet.</div>
+ <div id="journalList" class="journal-list"></div>
+</section>
+
+<section class="card section">
+ <h2>Option chain</h2><div class="tablewrap">
+ <table><thead><tr><th>Type</th><th>Strike</th><th>Symbol</th><th>Premium / Mark</th><th>Bid</th><th>Ask</th><th>Spread</th><th>IV</th><th>OI</th><th>Volume</th></tr></thead><tbody id="tbody"><tr><td colspan="10" style="text-align:center;color:#a9b8cf">Abhi chain load nahi hui.</td></tr></tbody></table>
+ </div><div class="status" id="tableStatus">Data refresh karne ke liye Load option chain dabayein.</div>
+</section>
+<section class="grid section">
+ <div class="card"><h2>Call vs Put snapshot</h2><div id="bars" class="note">Chain load hone par OI comparison yahan dikhega.</div></div>
+ <div class="card"><h2>Signal status</h2><div class="big yellow" id="signal">WAIT</div><p class="note" id="signalreason">Options chain ke data ko dekhna analysis ka ek hissa hai. Is version mein automatic BUY CALL/PUT recommendation nahi di jaati.</p><div class="row"><span>Automatic order placement</span><b class="green">Disabled</b></div></div>
+</section>
+
+<section class="card section">
+ <h2>Alerts (page open rehna chahiye)</h2>
+ <p class="note">Alerts isi browser tab mein check honge. Phone notification ke liye permission allow karein; Android/browser background mein tab ko pause kar sakta hai.</p>
+ <div class="toolbar">
+  <label style="display:flex;gap:8px;align-items:center"><input id="alertsOn" type="checkbox"> Alerts enable</label>
+  <div class="field"><label for="spotMove">Spot move alert (%)</label><input id="spotMove" type="number" min="0.1" step="0.1" value="1"></div>
+  <div class="field"><label for="pcrLevel">OI PCR alert threshold</label><input id="pcrLevel" type="number" min="0.1" step="0.1" value="1.2"></div>
+  <div class="field"><label for="premiumLevel">Option premium alert</label><input id="premiumLevel" type="number" min="0" step="0.01" placeholder="e.g. 100"></div>
+  <button class="btn" id="notifyPerm">Enable notifications</button>
+  <button class="btn" id="checkNow">Refresh all data</button>
+ </div>
+ <div class="row"><span>Alert status</span><b id="alertStatus">Disabled</b></div>
+ <div class="row"><span>Last alert</span><b id="lastAlert">None</b></div>
+ <div class="row"><span>Last data refresh</span><b id="lastRefresh">Not yet refreshed</b></div>
+ <div class="note" id="alertLog" aria-live="polite">Alert log yahan dikhega.</div>
+</section>
+<div class="footer">Source: Delta Exchange India public market-data endpoints. Option chain and candle fields may change; verify against exchange docs. V7 setup score is rule-based, not machine-learning or guaranteed prediction. If browser blocks API requests (CORS/network), a backend proxy or hosted version may be required. This HTML uses public market data only; never put private API keys in it. Alerts work only while this page is open and the browser allows background execution. Educational analysis only, not financial advice.</div>
+ Option-chain API query uses contract_types=call_options,put_options, underlying_asset_symbols and expiry_date DD-MM-YYYY. Browser/network CORS may block direct requests; if so, use a backend proxy. Never put private API secrets in this HTML file. Public API field names can change; verify against exchange docs. Educational analysis only, not financial advice.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=(v,dp=2)=>v!==null&&v!==undefined&&v!==""&&Number.isFinite(Number(v))?Number(v).toLocaleString("en-US",{maximumFractionDigits:dp}):"Unavailable";
+function dateLocalInput(d){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
+function ddmmyyyy(value){if(!value)return "";const [y,m,d]=value.split("-");return `${d}-${m}-${y}`}
+function getNum(...vals){for(const v of vals){if(v!==undefined&&v!==null&&v!==""&&Number.isFinite(Number(v)))return Number(v)}return null}
+function extract(r){if(Array.isArray(r))return r;if(r&&Array.isArray(r.result))return r.result;if(r&&Array.isArray(r.data))return r.data;return []}
+function oiOf(x){return getNum(x.oi,x.open_interest,x.openInterest)}
+function ivOf(x){return getNum(x.mark_iv,x.implied_volatility,x.iv,x.mark_vol,x.quotes?.ask_iv,x.quotes?.bid_iv)}
+function premOf(x){return getNum(x.mark_price,x.close,x.last_price,x.price,x.quotes?.mark_price)}
+function bidOf(x){return getNum(x.quotes?.best_bid,x.best_bid,x.bid)}
+function askOf(x){return getNum(x.quotes?.best_ask,x.best_ask,x.ask)}
+function typeOf(x){const s=String(x.contract_type||x.product_type||x.symbol||"").toLowerCase();if(s.includes("call")||s.startsWith("c-"))return "CALL";if(s.includes("put")||s.startsWith("p-"))return "PUT";return "OPTION"}
+function strikeOf(x){return getNum(x.strike_price,x.strike)}
+function showStatus(msg,error=false){$("status").textContent=msg;$("status").style.color=error?"var(--red)":"var(--muted)"}
+let optionItems=[],trendState={spot:null,score4:0,score1:0,trend4:"Unavailable",trend1:"Unavailable",sweep:"Unavailable",low:null,high:null};
+let previousSpot=null, previousPCR=null, lastPremiumAlertAt=0, timer=null, alertMessages=[];
+function notify(msg){
+ $("lastAlert").textContent=msg;
+ $("alertLog").textContent=new Date().toLocaleTimeString()+" — "+msg;
+ alertMessages.unshift(msg);alertMessages=alertMessages.slice(0,5);
+ if("Notification" in window && Notification.permission==="granted"){try{new Notification("Crypto Scope AI V4",{body:msg})}catch(e){}}
+}
+async function apiJson(url){const r=await fetch(url,{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();if(j.success===false)throw new Error(j.error||"API error");return j.result??j.data??j}
+function productSymbol(asset){return ({ETH:"ETHUSD",BTC:"BTCUSD",SOL:"SOLUSD"})[asset]||asset}
+async function fetchTicker(sym){return apiJson("https://api.india.delta.exchange/v2/tickers/"+encodeURIComponent(productSymbol(sym)))}
+async function fetchCandles(sym,resolution,count=100){
+ const end=Math.floor(Date.now()/1000),secs=resolution==="15m"?900:resolution==="1h"?3600:14400,start=end-secs*count;
+ const u=new URL("https://api.india.delta.exchange/v2/history/candles");
+ u.searchParams.set("symbol",productSymbol(sym));u.searchParams.set("resolution",resolution);u.searchParams.set("start",String(start));u.searchParams.set("end",String(end));
+ const d=await apiJson(u.toString());const arr=Array.isArray(d)?d:(d.candles||d.result||[]);
+ return arr.map(x=>({time:Number(x.time??x.t??x.timestamp),open:Number(x.open??x.o),high:Number(x.high??x.h),low:Number(x.low??x.l),close:Number(x.close??x.c),volume:Number(x.volume??x.v??0)})).filter(x=>[x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.time-b.time);
+}
+function ema(vals,p){if(vals.length<p)return null;let e=vals.slice(0,p).reduce((a,b)=>a+b,0)/p,k=2/(p+1);for(let i=p;i<vals.length;i++)e=vals[i]*k+e*(1-k);return e}
+function analyzeCandles(arr){
+ if(arr.length<30)return {trend:"Data kam",score:0,meta:"Trend ke liye kam se kam 30 candles chahiye",low:null,high:null,sweep:"Unavailable"};
+ const cs=arr.map(x=>x.close),last=arr[arr.length-1],e20=ema(cs,20),e50=ema(cs,Math.min(50,Math.max(2,Math.floor(cs.length/2))));
+ let trend="Sideways",score=0;
+ if(e20!==null&&e50!==null){if(last.close>e20&&e20>e50){trend="Bullish";score=1}else if(last.close<e20&&e20<e50){trend="Bearish";score=-1}}
+ const prior=arr.slice(-21,-1),prevHigh=Math.max(...prior.map(x=>x.high)),prevLow=Math.min(...prior.map(x=>x.low));
+ let sweep="No clear sweep";
+ if(last.low<prevLow&&last.close>prevLow)sweep="Sell-side sweep";
+ else if(last.high>prevHigh&&last.close<prevHigh)sweep="Buy-side sweep";
+ return {trend,score,meta:`Close ${fmt(last.close)} · EMA20 ${fmt(e20)} · EMA50 ${fmt(e50)}`,low:Math.min(...arr.slice(-30).map(x=>x.low)),high:Math.max(...arr.slice(-30).map(x=>x.high)),sweep,last};
+}
+function calcOptionMetrics(items){
+ const parsed=items.map(x=>({...x,_type:typeOf(x),_strike:strikeOf(x),_oi:oiOf(x),_iv:ivOf(x),_prem:premOf(x),_bid:bidOf(x),_ask:askOf(x),_vol:getNum(x.volume,x.size)})).filter(x=>x._strike!==null);
+ const spot=getNum(...items.map(x=>x.spot_price).filter(x=>x!=null),...items.map(x=>x.underlying_price).filter(x=>x!=null));
+ const strikes=[...new Set(parsed.map(x=>x._strike))].sort((a,b)=>a-b);
+ const atm=strikes.length?(spot!==null?strikes.reduce((a,b)=>Math.abs(b-spot)<Math.abs(a-spot)?b:a,strikes[0]):strikes[Math.floor(strikes.length/2)]):null;
+ const calls=parsed.filter(x=>x._type==="CALL"),puts=parsed.filter(x=>x._type==="PUT");
+ const sumOI=a=>{const vals=a.map(x=>x._oi).filter(x=>x!==null);return vals.length?vals.reduce((s,n)=>s+n,0):null};
+ const co=sumOI(calls),po=sumOI(puts),max=a=>{const ok=a.filter(x=>x._oi!==null);return ok.length?ok.reduce((p,c)=>c._oi>p._oi?c:p):null};
+ return {parsed,spot,atm,calls,puts,co,po,pcr:co!==null&&co>0&&po!==null?po/co:null,mc:max(calls),mp:max(puts)};
+}
+function buildRows(items,spot){
+ const m=calcOptionMetrics(items),parsed=m.parsed,strikes=[...new Set(parsed.map(x=>x._strike))].sort((a,b)=>a-b),atm=m.atm;
+ let visible=parsed,range=$("range").value;
+ if(range!=="all"&&atm!==null){const n=Number(range),near=strikes.slice().sort((a,b)=>Math.abs(a-atm)-Math.abs(b-atm)).slice(0,n*2+1);visible=parsed.filter(x=>near.includes(x._strike))}
+ visible.sort((a,b)=>a._strike-b._strike||a._type.localeCompare(b._type));
+ if(!visible.length){$("tbody").innerHTML='<tr><td colspan="10" style="text-align:center;color:#a9b8cf">API ne option rows return nahi kiye ya field format unexpected hai.</td></tr>';return {visible,atm,parsed}}
+ $("tbody").innerHTML=visible.map(x=>{const spr=x._ask!==null&&x._bid!==null?x._ask-x._bid:null,typ=x._type,cls=atm!==null&&x._strike===atm?' class="atm"':"",sym=String(x.symbol||x.product_symbol||"Unavailable");return `<tr${cls}><td class="${typ==="CALL"?"green":typ==="PUT"?"red":""}">${typ}</td><td>${fmt(x._strike,4)}</td><td>${sym}</td><td>${fmt(x._prem,6)}</td><td>${fmt(x._bid,6)}</td><td>${fmt(x._ask,6)}</td><td>${fmt(spr,6)}</td><td>${x._iv===null?"Unavailable":fmt(x._iv*(x._iv>1?1:100),2)+(x._iv<=1?"%":"")}</td><td>${fmt(x._oi,2)}</td><td>${fmt(x._vol,2)}</td></tr>`}).join("");
+ return {visible,atm,parsed};
+}
+function renderOptions(items){
+ optionItems=items;const m=calcOptionMetrics(items),{visible}=buildRows(items,m.spot);
+ $("spot").textContent=fmt(m.spot);$("atm").textContent=fmt(m.atm,4);$("rows").textContent=String(visible.length);
+ $("calloi").textContent=fmt(m.co);$("putoi").textContent=fmt(m.po);$("pcr").textContent=m.pcr===null?"Unavailable":fmt(m.pcr,3);
+ $("maxcall").textContent=m.mc?`${fmt(m.mc._strike,4)} (OI ${fmt(m.mc._oi)})`:"Unavailable";$("maxput").textContent=m.mp?`${fmt(m.mp._strike,4)} (OI ${fmt(m.mp._oi)})`:"Unavailable";
+ $("tableStatus").textContent=`API se ${m.parsed.length} contracts receive hue; table mein ${visible.length} dikh rahe hain. ATM nearest strike estimate hai.`;
+ const bar=(label,val,maxv,color)=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;gap:10px"><span>${label}</span><b>${fmt(val)}</b></div><div style="height:8px;background:#26364c;border-radius:8px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${val!==null&&maxv?Math.max(0,Math.min(100,val/maxv*100)):0}%;background:${color}"></div></div></div>`;
+ const maxoi=Math.max(m.co||0,m.po||0);$("bars").innerHTML=m.co===null&&m.po===null?"OI fields API response mein available nahi hain.":bar("Call OI",m.co,maxoi,"#48d6a0")+bar("Put OI",m.po,maxoi,"#ff7f88");
+ $("combinedPCR").textContent=m.pcr===null?"Unavailable":fmt(m.pcr,3);
+ $("combinedCallWall").textContent=m.mc?`${fmt(m.mc._strike,2)} (OI ${fmt(m.mc._oi)})`:"Unavailable";
+ $("combinedPutWall").textContent=m.mp?`${fmt(m.mp._strike,2)} (OI ${fmt(m.mp._oi)})`:"Unavailable";
+ $("signal").textContent="WAIT";$("signal").className="big yellow";
+ $("signalreason").textContent="Chain data load hua. OI/PCR akela direction signal nahi; trend, IV, spread, expiry aur premium bhi check karein.";
+ updateCombined();
+ updateV5Setup();
+ updateV7();
+ checkAlerts();
+}
+function updateCombined(){
+ const t=trendState,aligned=t.score4!==0&&t.score4===t.score1;
+ $("trendSpot").textContent=fmt(t.spot);$("trend4h").textContent=t.trend4;$("trend1h").textContent=t.trend1;
+ $("trendLow").textContent=fmt(t.low);$("trendHigh").textContent=fmt(t.high);$("sweep").textContent=t.sweep;
+ $("trendNote").textContent=t.meta||"Trend data unavailable.";
+ $("trendAlign").textContent=aligned?"2/2 same direction":(t.score4===0||t.score1===0?"Not confirmed":"Timeframes disagree");
+ let bias="WAIT",reason="Trend confirmation ya live data incomplete hai.";
+ if(aligned&&t.score4===1){bias="BULLISH TREND";reason="4H aur 1H EMA rules bullish hain. Option chain ko separately verify karein."}
+ if(aligned&&t.score4===-1){bias="BEARISH TREND";reason="4H aur 1H EMA rules bearish hain. Option chain ko separately verify karein."}
+ if(t.sweep==="Sell-side sweep"&&t.score1===1){bias="BULLISH WATCH";reason="1H low sweep + bullish trend rule; candle confirmation zaroori hai."}
+ if(t.sweep==="Buy-side sweep"&&t.score1===-1){bias="BEARISH WATCH";reason="1H high sweep + bearish trend rule; candle confirmation zaroori hai."}
+ $("combinedBias").textContent=bias;$("combinedBias").className="big "+(bias.includes("BULLISH")?"green":bias.includes("BEARISH")?"red":"yellow");$("combinedNote").textContent=reason+" Yeh automatic BUY CALL/PUT recommendation nahi hai.";
+}
+
+function optionLiquidityAssessment(){
+ if(!optionItems.length)return {label:"No chain data",good:false,spread:null};
+ const m=calcOptionMetrics(optionItems);
+ const rows=m.parsed.filter(x=>x._prem!==null&&x._bid!==null&&x._ask!==null&&x._ask>=x._bid);
+ if(!rows.length)return {label:"Bid/ask incomplete",good:false,spread:null};
+ const spreads=rows.map(x=>x._ask>0?(x._ask-x._bid)/x._ask*100:null).filter(x=>x!==null&&Number.isFinite(x)).sort((a,b)=>a-b);
+ const med=spreads[Math.floor(spreads.length/2)];
+ if(med<=3)return {label:`Tight median spread ~${fmt(med,2)}%`,good:true,spread:med};
+ if(med<=8)return {label:`Medium median spread ~${fmt(med,2)}%`,good:false,spread:med};
+ return {label:`Wide median spread ~${fmt(med,2)}%`,good:false,spread:med};
+}
+function updateV5Setup(){
+ const t=trendState,aligned=t.score4!==0&&t.score4===t.score1,liq=optionLiquidityAssessment();
+ let score=0,parts=[];
+ if(t.spot!==null){score+=1;parts.push("spot available")}else parts.push("spot unavailable");
+ if(aligned){score+=3;parts.push("4H/1H aligned")}else parts.push("trend not aligned");
+ if(t.sweep==="Sell-side sweep"&&t.score1===1){score+=2;parts.push("sell-side sweep + bullish 1H")}
+ else if(t.sweep==="Buy-side sweep"&&t.score1===-1){score+=2;parts.push("buy-side sweep + bearish 1H")}
+ else if(t.sweep==="No clear sweep"){score+=1;parts.push("no clear sweep")}
+ if(optionItems.length){score+=1;parts.push("option chain loaded")}else parts.push("chain unavailable");
+ if(liq.good){score+=2;parts.push("spread relatively tight")}else if(liq.spread!==null&&liq.spread<=8){score+=1;parts.push("spread medium")}else parts.push("spread unknown/wide");
+ score=Math.min(10,score);
+ $("setupScore").textContent=`${score}/10`;
+ $("setupScore").className="setup-score "+(score>=7?"green":score>=4?"yellow":"red");
+ let state="WAIT / NO SETUP";
+ if(aligned&&t.score4===1)state="Bullish trend context";
+ if(aligned&&t.score4===-1)state="Bearish trend context";
+ if(t.spot===null||t.trend1==="Unavailable"||t.trend4==="Unavailable")state="Incomplete data";
+ $("setupState").textContent=state;
+ $("setupAlign").textContent=aligned?(t.score4===1?"Bullish 2/2":"Bearish 2/2"):"Not aligned";
+ $("setupSweep").textContent=t.sweep||"Unavailable";
+ $("setupLiquidity").textContent=liq.label;
+ $("setupReason").textContent=`Rule points: ${parts.join(" · ")}. Score sirf checklist completeness/context dikhata hai—win probability nahi. 7+ hone par bhi entry confirmation zaroori hai.`;
+ let direction="WAIT";
+ if(aligned&&t.score4===1)direction="CALL-side watch only";
+ if(aligned&&t.score4===-1)direction="PUT-side watch only";
+ if(t.spot===null||!aligned)direction="WAIT";
+ $("planDirection").textContent=direction;
+ $("planZone").textContent=(t.low!==null&&t.high!==null)?`${fmt(t.low)} – ${fmt(t.high)} (recent 1H range)`:"Unavailable";
+ $("planSpread").textContent=liq.label;
+ $("planStatus").textContent=(t.spot!==null&&aligned&&optionItems.length&&liq.spread!==null&&liq.spread<=8)?"Review candle + contract manually":"Wait / avoid incomplete setup";
+}
+function calculateRisk(){
+ const capital=Number($("riskCapital").value),pct=Number($("riskPct").value),entry=Number($("entryPremium").value),stop=Number($("stopPremium").value),target=Number($("targetPremium").value),units=Number($("contractUnits").value);
+ const budget=capital*pct/100;
+ $("riskBudget").textContent=Number.isFinite(budget)&&budget>0?`₹${fmt(budget,2)}`:"--";
+ if(!(capital>0&&pct>0&&pct<=5&&entry>0&&stop>0&&target>0&&units>0&&stop<entry)){
+  ["riskQty","riskLoss","riskProfit","riskRR","riskCost"].forEach(id=>$(id).textContent="--");
+  $("riskNote").textContent="Valid inputs bharein: capital/risk positive, stop-loss entry se kam, target aur units positive hon.";
+  return;
+ }
+ const perContractRisk=(entry-stop)*units,qty=Math.floor(budget/perContractRisk),loss=qty*perContractRisk,profit=qty*(target-entry)*units,cost=qty*entry*units,rr=(target-entry)/(entry-stop);
+ $("riskQty").textContent=String(qty)+" contract(s)";
+ $("riskLoss").textContent=`₹${fmt(loss,2)}`;
+ $("riskProfit").textContent=`₹${fmt(profit,2)}`;
+ $("riskRR").textContent=`1 : ${fmt(rr,2)}`;
+ $("riskCost").textContent=`₹${fmt(cost,2)}`;
+ $("riskNote").textContent=qty<1?"Risk budget ek contract ke estimated stop-loss se kam hai. Quantity ko force karke 1 na karein.":"Estimate only: fees, slippage, spread aur contract multiplier actual result badal sakte hain. Capital used premium estimate hai.";
+}
+function resetRisk(){
+ $("riskCapital").value="1000";$("riskPct").value="1";$("entryPremium").value="50";$("stopPremium").value="40";$("targetPremium").value="70";$("contractUnits").value="1";calculateRisk();
+}
+
+async function loadOptions(silent=false){
+ const underlying=$("underlying").value,expiry=ddmmyyyy($("expiry").value);
+ if(!expiry){if(!silent)showStatus("Pehle expiry date select karein.",true);return}
+ $("load").disabled=true;if(!silent)showStatus("Delta Exchange option chain load ho rahi hai…");
+ try{
+  const u=new URL("https://api.india.delta.exchange/v2/tickers");u.searchParams.set("contract_types","call_options,put_options");u.searchParams.set("underlying_asset_symbols",underlying);u.searchParams.set("expiry_date",expiry);
+  const r=await fetch(u.toString(),{headers:{Accept:"application/json"},cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);
+  const j=await r.json();if(j.success===false)throw new Error(j.error||"API error");const items=extract(j);if(!items.length)throw new Error("Is expiry par option contracts return nahi hue.");
+  renderOptions(items);if(!silent)showStatus(`Option chain connected · ${underlying} expiry ${expiry} · ${new Date().toLocaleTimeString()}`);
+ }catch(e){if(!silent)showStatus("Live option chain load nahi hui: "+e.message+" — CORS/network issue ho sakta hai.",true);$("tableStatus").textContent="Live option chain unavailable; no fake data shown.";if(!optionItems.length){$("signal").textContent="WAIT";$("signalreason").textContent="Live option data nahi mila."}}
+ finally{$("load").disabled=false}
+}
+
+let v7State={score15:0,trend15:"Unavailable",structure:"Unavailable",volume:"Unavailable"};
+function analyzeStructure(arr){
+ if(arr.length<12)return {label:"Data kam",score:0,volume:"Unavailable"};
+ const recent=arr.slice(-12), prev=arr.slice(-24,-12);
+ if(prev.length<8)return {label:"Data kam",score:0,volume:"Unavailable"};
+ const rh=Math.max(...recent.slice(-6).map(x=>x.high)),ph=Math.max(...prev.slice(-6).map(x=>x.high));
+ const rl=Math.min(...recent.slice(-6).map(x=>x.low)),pl=Math.min(...prev.slice(-6).map(x=>x.low));
+ let label="Mixed / range",score=0;
+ if(rh>ph&&rl>pl){label="HH + HL (bullish)";score=1}
+ else if(rh<ph&&rl<pl){label="LH + LL (bearish)";score=-1}
+ const vols=arr.slice(-21,-1).map(x=>x.volume).filter(x=>Number.isFinite(x)&&x>0);
+ const last=arr[arr.length-1],avg=vols.length?vols.reduce((a,b)=>a+b,0)/vols.length:0;
+ const volume=avg>0?(last.volume>=avg*1.3?"Above average":last.volume<=avg*.7?"Below average":"Near average"):"Volume unavailable";
+ return {label,score,volume};
+}
+function updateV7(){
+ const t=trendState, v=v7State,liq=optionLiquidityAssessment();
+ const complete=t.spot!==null&&t.score4!==0&&t.score1!==0&&v.score15!==0;
+ const trendBull=t.score4===1&&t.score1===1&&v.score15===1;
+ const trendBear=t.score4===-1&&t.score1===-1&&v.score15===-1;
+ const sweepBull=t.sweep==="Sell-side sweep",sweepBear=t.sweep==="Buy-side sweep";
+ const structBull=v.structure==="HH + HL (bullish)",structBear=v.structure==="LH + LL (bearish)";
+ const volumeOK=v.volume==="Above average";
+ const optionOK=optionItems.length>0&&liq.spread!==null&&liq.spread<=8;
+ let decision="WAIT",reasons=[];
+ if(trendBull&&structBull&&sweepBull&&optionOK){decision="CALL-SIDE WATCH";reasons.push("4H/1H/15m bullish", "HH+HL structure", "sell-side sweep", "option spread acceptable")}
+ else if(trendBear&&structBear&&sweepBear&&optionOK){decision="PUT-SIDE WATCH";reasons.push("4H/1H/15m bearish", "LH+LL structure", "buy-side sweep", "option spread acceptable")}
+ else {
+  if(!complete)reasons.push("trend data/confirmation incomplete");
+  if(!(trendBull||trendBear))reasons.push("timeframes not fully aligned");
+  if(!(structBull||structBear))reasons.push("structure not confirmed");
+  if(!(sweepBull||sweepBear))reasons.push("no clear liquidity sweep");
+  if(!optionOK)reasons.push("options data missing or spread too wide");
+ }
+ $("v7Decision").textContent=decision;
+ $("v7Decision").className="big "+(decision.startsWith("CALL")?"green":decision.startsWith("PUT")?"red":"yellow");
+ $("v7Summary").textContent=decision==="WAIT"?"Conditions match nahi hui. Trade force na karein.": "Potential setup watch only; entry se pehle candle close aur option premium confirm karein.";
+ $("v7Four").textContent=t.trend4;
+ $("v7One").textContent=t.trend1;
+ $("v7Fifteen").textContent=v.trend15;
+ $("v7Structure").textContent=v.structure;
+ $("v7Sweep").textContent=t.sweep;
+ $("v7Options").textContent=optionOK?liq.label:(optionItems.length?liq.label:"Chain unavailable");
+ $("v7Why").textContent="Checks: "+reasons.join(" · ")+". Volume: "+v.volume+". Volume is supporting evidence, not a requirement by itself. OI alone does not prove buyer/seller direction. This is not a trade order.";
+}
+
+async function loadTrend(silent=false){
+ const sym=$("underlying").value;try{
+  const [t,c4,c1,c15]=await Promise.all([fetchTicker(sym),fetchCandles(sym,"4h",100),fetchCandles(sym,"1h",100),fetchCandles(sym,"15m",100)]);
+  const price=getNum(t.close,t.last_price,t.mark_price,t.spot_price,t.price);
+  const a4=analyzeCandles(c4),a1=analyzeCandles(c1),a15=analyzeCandles(c15),st=analyzeStructure(c1);
+  trendState={spot:price,score4:a4.score||0,score1:a1.score||0,trend4:a4.trend,trend1:a1.trend,sweep:a1.sweep,low:a1.low,high:a1.high,meta:`Candle symbol ${productSymbol(sym)}. 4H: ${a4.meta}. 1H: ${a1.meta}. 15m: ${a15.meta}.`};
+  v7State={score15:a15.score||0,trend15:a15.trend,structure:st.label,volume:st.volume};
+  updateCombined(); updateV7();
+  if(!silent){$("lastRefresh").textContent=new Date().toLocaleTimeString();checkAlerts()}
+ }catch(e){trendState={...trendState,spot:null,score4:0,score1:0,trend4:"Unavailable",trend1:"Unavailable",sweep:"Unavailable",low:null,high:null,meta:"Trend API unavailable: "+e.message};updateCombined();updateV7();if(!silent)showStatus("Trend data load nahi hua: "+e.message+" — CORS/network proxy ki zaroorat ho sakti hai.",true)}
+}
+async function refreshAll(silent=false){
+ if(!silent)showStatus("Trend + options data refresh ho raha hai…");
+ await Promise.all([loadTrend(silent),loadOptions(silent)]);
+ $("lastRefresh").textContent=new Date().toLocaleTimeString();
+ if(!silent && trendState.spot!==null)showStatus("Refresh complete · "+new Date().toLocaleTimeString());
+}
+function checkAlerts(){
+ if(!$("alertsOn")?.checked)return;
+ const spot=trendState.spot,moveThreshold=Math.max(.1,Number($("spotMove").value)||1),pcrThreshold=Number($("pcrLevel").value)||1.2;
+ if(spot!==null&&previousSpot!==null&&previousSpot>0){const pct=Math.abs((spot-previousSpot)/previousSpot*100);if(pct>=moveThreshold){notify(`Spot ${fmt(spot)}; last check se ${fmt(pct,2)}% move.`);previousSpot=spot;return}}
+ if(spot!==null)previousSpot=spot;
+ const pcr=getNum($("pcr").textContent);
+ if(pcr!==null&&previousPCR!==null&&((previousPCR<pcrThreshold&&pcr>=pcrThreshold)||(previousPCR>1/pcrThreshold&&pcr<=1/pcrThreshold))){notify(`OI PCR threshold cross hua: ${fmt(pcr,3)}. Context ke saath check karein.`)}
+ if(pcr!==null)previousPCR=pcr;
+ const plev=Number($("premiumLevel").value);
+ if(Number.isFinite(plev)&&plev>0&&Date.now()-lastPremiumAlertAt>60000){
+  const hit=optionItems.map(x=>({...x,_p:premOf(x)})).find(x=>x._p!==null&&x._p>=plev);
+  if(hit){notify(`Option premium threshold ${fmt(plev)} hit/cross: ${hit.symbol||"option"} premium ${fmt(hit._p,6)}.`);lastPremiumAlertAt=Date.now()}
+ }
+ $("alertStatus").textContent="Enabled · periodic checks";
+}
+
+
+const JOURNAL_KEY="crypto_scope_ai_v6_journal";
+function readJournal(){
+ try{const x=JSON.parse(localStorage.getItem(JOURNAL_KEY)||"[]");return Array.isArray(x)?x:[]}catch(e){return []}
+}
+function saveJournalData(items){
+ try{localStorage.setItem(JOURNAL_KEY,JSON.stringify(items));return true}catch(e){$("journalStatus").textContent="Browser storage unavailable. Export records before closing.";return false}
+}
+function safeText(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function renderJournal(){
+ const items=readJournal();
+ $("journalCount").textContent=String(items.length);
+ const completed=items.filter(x=>["Win","Loss","Breakeven"].includes(x.outcome));
+ $("journalCompleted").textContent=String(completed.length);
+ const pnl=items.reduce((sum,x)=>sum+(Number.isFinite(Number(x.pnl))&&x.pnl!==""?Number(x.pnl):0),0);
+ $("journalTotal").textContent="₹"+fmt(pnl,2);
+ const list=$("journalList");
+ if(!items.length){list.innerHTML="";$("journalStatus").textContent="No records saved yet.";return}
+ $("journalStatus").textContent="Newest record first · "+items.length+" saved record(s)";
+ list.innerHTML=items.slice().reverse().map(x=>`<div class="journal-item"><div class="top"><b>${safeText(x.side)} · ${safeText(x.outcome)}</b><span>${safeText(x.date)}</span></div><p>Entry: ${safeText(x.entry||"—")} · SL: ${safeText(x.sl||"—")} · Target: ${safeText(x.target||"—")} · P/L: ${x.pnl===""||x.pnl===null?"—":"₹"+safeText(x.pnl)}</p><p>${safeText(x.notes||"No note added")}</p><button class="btn" type="button" data-journal-delete="${safeText(x.id)}">Delete record</button></div>`).join("");
+ list.querySelectorAll("[data-journal-delete]").forEach(b=>b.addEventListener("click",()=>{const id=b.getAttribute("data-journal-delete");const next=readJournal().filter(x=>String(x.id)!==String(id));saveJournalData(next);renderJournal()}));
+}
+function fillJournalFromSetup(){
+ const dir=$("planDirection").textContent;
+ $("journalSide").value=dir.includes("CALL")?"CALL watch":dir.includes("PUT")?"PUT watch":"NO TRADE";
+ const spot=trendState.spot;
+ const note=`Analysis snapshot: ${new Date().toLocaleString()}; spot=${spot===null?"unavailable":fmt(spot)}; 4H=${trendState.trend4}; 1H=${trendState.trend1}; sweep=${trendState.sweep}; setup score=${$("setupScore").textContent}. This is a rule-based snapshot, not a guaranteed signal.`;
+ $("journalNotes").value=note;
+}
+function addJournalRecord(){
+ const pnlValue=$("journalPnl").value;
+ const item={id:String(Date.now())+"-"+Math.random().toString(36).slice(2,7),date:new Date().toLocaleString(),side:$("journalSide").value,entry:$("journalEntry").value,sl:$("journalSL").value,target:$("journalTarget").value,outcome:$("journalOutcome").value,pnl:pnlValue,notes:$("journalNotes").value.trim()};
+ const items=readJournal();items.push(item);
+ if(saveJournalData(items)){renderJournal();$("journalStatus").textContent="Record saved on this browser/device."; }
+}
+function exportJournalCSV(){
+ const items=readJournal();
+ if(!items.length){$("journalStatus").textContent="Export karne ke liye koi record nahi hai.";return}
+ const cols=["date","side","entry","sl","target","outcome","pnl","notes"];
+ const csv=[cols.join(","),...items.map(x=>cols.map(k=>'"'+String(x[k]??"").replace(/"/g,'""')+'"').join(","))].join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="crypto_scope_ai_v6_journal.csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+ $("journalStatus").textContent="CSV export start hua. Downloads folder check karein.";
+}
+$("journalAdd").addEventListener("click",addJournalRecord);
+$("journalUseSetup").addEventListener("click",fillJournalFromSetup);
+$("journalExport").addEventListener("click",exportJournalCSV);
+$("journalClear").addEventListener("click",()=>{if(confirm("Kya aap poora journal clear karna chahte hain? Pehle CSV export kar lein.")){saveJournalData([]);renderJournal()}});
+renderJournal();
+
+$("calcRisk").addEventListener("click",calculateRisk);
+$("resetRisk").addEventListener("click",resetRisk);
+["riskCapital","riskPct","entryPremium","stopPremium","targetPremium","contractUnits"].forEach(id=>$(id).addEventListener("input",calculateRisk));
+resetRisk();
+
+$("load").addEventListener("click",()=>loadOptions(false));
+$("range").addEventListener("change",()=>{if(optionItems.length)renderOptions(optionItems)});
+$("underlying").addEventListener("change",()=>refreshAll(false));
+$("checkNow").addEventListener("click",()=>refreshAll(false));
+$("notifyPerm").addEventListener("click",async()=>{if(!("Notification" in window)){notify("Is browser mein notifications support nahi hai; page ke alert log ko check karein.");return}try{const p=await Notification.requestPermission();$("alertStatus").textContent="Notification permission: "+p;if(p==="granted")notify("Browser notifications enabled.")}catch(e){$("alertStatus").textContent="Notification permission unavailable"}});
+$("alertsOn").addEventListener("change",()=>{$("alertStatus").textContent=$("alertsOn").checked?"Enabled · periodic checks":"Disabled";if($("alertsOn").checked){previousSpot=trendState.spot;previousPCR=getNum($("pcr").textContent);notify("Alerts enabled. Page khula rakhein.")}});
+window.addEventListener("beforeunload",()=>{if(timer)clearInterval(timer)});
+const now=new Date();$("expiry").value=dateLocalInput(now);
+refreshAll(false);
+timer=setInterval(()=>refreshAll(true),60000);
+</script></body></html>
